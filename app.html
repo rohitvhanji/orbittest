@@ -15,7 +15,7 @@
         }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: white; overflow: hidden; }
 
-        /* General Buttons */
+        /* Buttons */
         .btn-main { width: 100%; border: none; padding: 16px; border-radius: 8px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-login { background: var(--slack-purple); color: white; }
         .btn-signup { background: var(--slack-green); color: white; }
@@ -25,13 +25,11 @@
         #sidebar { width: 340px; background: var(--slack-purple); color: white; display: flex; flex-direction: column; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header { padding: 18px; background: var(--slack-navy); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .sidebar-header h2 { margin: 0; font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: white; text-transform: uppercase; }
-        
-        /* Management Section (Sidebar) */
         .mgmt-section { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
         .mgmt-input { width: 100%; padding: 10px; border-radius: 4px; border: none; margin-bottom: 6px; box-sizing: border-box; background: rgba(255,255,255,0.1); color: white; }
         #member-groups { overflow-y: auto; flex-grow: 1; padding-bottom: 20px; }
         
-        /* Timezone Cards */
+        /* Timezone & Members */
         .timezone-group { background: rgba(0,0,0,0.1); margin-top: 2px; }
         .tz-header { padding: 10px 15px; font-size: 0.7rem; font-weight: 900; background: rgba(0,0,0,0.25); display: flex; justify-content: space-between; align-items: center; }
         .btn-hover-del { cursor: pointer; color: #ff4d4d; font-size: 1.1rem; opacity: 0; transition: 0.2s; padding-left: 10px; }
@@ -41,15 +39,15 @@
         .member-row { padding: 6px 15px 6px 30px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 10px; }
         
-        /* Main View */
+        /* Main Container */
         #main-view-container { flex-grow: 1; display: flex; flex-direction: column; background: #fff; position: relative; width: 100%; height: 100%; overflow: hidden; }
         
-        /* Map Area */
+        /* Map */
         #map-area { flex-grow: 1; position: relative; overflow: hidden; background: #000; display: none; }
         #map-bg { width: 100%; height: 100%; background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg'); background-size: 100% 100%; filter: saturate(0.5) brightness(1.1); }
         #svg-map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        /* Rec View */
+        /* Grid View */
         #rec-view { display: flex; flex-grow: 1; background: white; flex-direction: column; height: 100%; overflow: hidden; padding: 0; }
         
         .fixed-header-group { padding: 20px 30px 0 30px; background: white; flex-shrink: 0; border-bottom: 1px solid #eee; z-index: 20; }
@@ -84,11 +82,7 @@
         .tag-green { background: #E4F7EB; color: var(--slack-green); }
         .tag-yellow { background: #FEF3C7; color: #D97706; }
         .rec-time-main { font-size: 1.1rem; font-weight: 900; color: var(--text-dark); margin-bottom: 2px; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-        .rec-reason { font-size: 0.65rem; color: #888; margin-bottom: 5px; font-style: italic; }
         .rec-date-sub { font-size: 0.75rem; color: #666; margin-bottom: 10px; font-weight: 600; flex-shrink: 0; }
-        .rec-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex-grow: 1; padding-right: 5px; }
-        .rec-list::-webkit-scrollbar { width: 4px; }
-        .rec-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         .rec-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: #555; border-bottom: 1px solid #f5f5f5; padding-bottom: 3px; flex-shrink: 0; }
         .rec-row span:last-child { font-weight: 700; color: var(--text-dark); }
         .selected-card-style { border: 2px solid var(--slack-blue); background: #F2F7FF; box-shadow: 0 4px 12px rgba(18, 100, 163, 0.2); width: 100%; max-width: 300px; height: 235px; }
@@ -110,7 +104,7 @@
         .map-label-text { font-size: 10px; font-weight: 900; fill: white; paint-order: stroke; stroke: black; stroke-width: 3px; }
         .pin-lbl { font-size: 9px; font-weight: 800; fill: var(--slack-navy); paint-order: stroke; stroke: white; stroke-width: 2px; }
         
-        /* Scheduler Footer */
+        /* Floating Scheduler Footer */
         #scheduler { 
             position: absolute; 
             bottom: 30px; 
@@ -226,27 +220,28 @@
 
     let locationData = {}; let team = []; let isFitMode = false; let isMatchViewActive = true; let workDateUTC_MS = Date.now(); let chartExclusions = new Set(); let tzPreferences = {}; let manualSelectionSlot = null; let isGuestMode = false;
 
-    // Handle session - Default to GUEST if no user found (since landing page handles login)
     async function checkSession() { 
         const params = new URLSearchParams(window.location.search); 
         if(params.has('share')) { loadSharedState(params.get('share')); return; } 
-        
         const { data: { session } } = await _supabase.auth.getSession(); 
         if (session) { 
             isGuestMode = false; 
             document.getElementById('logout-btn').innerText = "Logout"; 
             loadData(); 
         } else {
-            // AUTO ENABLE GUEST MODE if not logged in
-            enableGuestMode();
+            enableGuestMode(); // Auto-enable guest
         }
     }
     
-    function enableGuestMode() { isGuestMode = true; document.getElementById('logout-btn').innerText = "☁️ Login to Save"; loadData(); }
+    function enableGuestMode() { 
+        isGuestMode = true; 
+        document.getElementById('logout-btn').innerText = "☁️ Login to Save"; 
+        loadData(); 
+    }
     
     async function logout() { 
         if(!isGuestMode) { await _supabase.auth.signOut(); }
-        window.location.href = 'index.html'; // Redirect to landing page
+        window.location.href = 'index.html'; 
     }
 
     function shareDashboard() { const payload = { d: document.getElementById('schedDate').value, dur: document.getElementById('durVal').value, ref: document.getElementById('inputTz').value, locs: locationData, team: team, pref: Array.from(Object.entries(tzPreferences)).map(([k, v]) => [k, Array.from(v)]) }; const url = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(payload))}`; navigator.clipboard.writeText(url).then(() => { const t = document.getElementById('share-toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }); }
@@ -335,6 +330,7 @@
             rowH += `</div><div class="chart-row"><div class="chart-label"><span>${loc.tz}</span><div class="pref-group"><div class="pref-pill ${prefs.has('early')?'active':''}" onclick="togglePreference('${key}', 'early')">🌅</div><div class="pref-pill ${prefs.has('night')?'active':''}" onclick="togglePreference('${key}', 'night')">🦉</div><div class="pref-pill ${prefs.has('global')?'global-active':''}" onclick="togglePreference('${key}', 'global')">🌍</div></div></div><div class="chart-grid">`;
             for(let i=0; i<count; i++){ const slot = sUTC + (i * sMs), lD = new Date(slot + (loc.offset * 3600000)), h = lD.getUTCHours() + (lD.getUTCMinutes()/60), s = getStatus(slot + (loc.offset * 3600000), h); let isG = false; if (lD.getUTCDay() !== 0 && lD.getUTCDay() !== 6) { if(prefs.has('global')) { if(h>=6 && h<24) isG = true; } else { if(!(h>=22.5 || h<7)) { if((h>=9 && h<12)||(h>=13.5 && h<17)) isG = true; if(prefs.has('early') && h>=7 && h<9) isG = true; if(prefs.has('night') && h>=17 && h<22.5) isG = true; } } } rowH += `<div class="chart-box ${isFitMode && workDateUTC_MS === slot ? 'highlight-slot' : ''}" style="background:#f4f4f4;">${isG ? '💻' : s.emoji}</div>`; }
             rowH += `</div></div></div>`;
+            body.innerHTML += rowH;
         });
         body.innerHTML += `<div class="chart-row match-row"><div class="chart-label">MATCH</div><div class="chart-grid" id="m-grid"></div></div>`;
         const g = document.getElementById('m-grid');
