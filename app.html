@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Orbit | Precision Scheduling</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -39,6 +38,14 @@
 
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); overflow: hidden; }
 
+        /* --- LOGO STYLE (Matches Index.html) --- */
+        .kindness-purple {
+            background: linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
         /* --- LAYOUT --- */
         #app-shell { display: flex; height: 100%; width: 100%; }
 
@@ -53,13 +60,9 @@
         }
         
         .sidebar-header { 
-            padding: 20px; 
+            padding: 24px; 
             background: var(--bg-surface); 
             display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; 
-        }
-        .sidebar-header h2 { 
-            margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; 
-            color: var(--text-main); 
         }
         
         .mgmt-section { padding: 12px 20px; border-bottom: 1px solid var(--border-subtle); }
@@ -193,10 +196,9 @@
         
         .section-header { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
         
-        .rec-column-left { flex-grow: 1; display: flex; flex-direction: column; }
+        .rec-column-left { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
         
         /* FIX: Align Left & Right Columns + Fix Cutoff */
-        /* Both left (reco) and right (selected) containers get same padding/layout props */
         #rec-results, #selected-results { 
             display: flex; 
             gap: 15px; 
@@ -211,7 +213,7 @@
         /* FIX: Increased Height to 320px to prevent clipping of button */
         .rec-card { 
             width: 280px; 
-            height: 320px; /* Taller height */
+            height: 320px; 
             flex-shrink: 0; 
             background: white; 
             border: 1px solid var(--border-subtle); border-radius: 16px; padding: 16px; 
@@ -303,7 +305,10 @@
 
 <div id="app-shell">
     <aside id="sidebar">
-        <div class="sidebar-header"><h2>ORBIT</h2><span id="logout-btn" onclick="logout()" style="cursor:pointer; font-size:0.75rem; color:var(--text-muted); font-weight:600;">Logout</span></div>
+        <div class="sidebar-header">
+            <span class="text-4xl font-black tracking-tighter kindness-purple">orbit</span>
+            <span id="logout-btn" onclick="logout()" style="cursor:pointer; font-size:0.75rem; color:var(--text-muted); font-weight:600; margin-left: auto;">Logout</span>
+        </div>
         <div class="mgmt-section"><input type="text" id="cityInput" class="mgmt-input" placeholder="City name..."><button id="addCityBtn" class="btn-main btn-login" onclick="lookupCity()">ADD OFFICE</button></div>
         <div class="mgmt-section"><input type="text" id="newName" class="mgmt-input" placeholder="Teammate Name..."><select id="newLoc" class="mgmt-input" style="appearance:none;"></select><button class="btn-main btn-signup" onclick="addMember()">ADD TEAMMATE</button></div>
         <div id="member-groups"></div>
@@ -477,5 +482,3 @@
 </script>
 </body>
 </html>
-
-```
