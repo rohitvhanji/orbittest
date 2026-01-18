@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=1280, initial-scale=0.1">
     <title>Orbit | Precision Scheduling</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -11,11 +11,11 @@
     <style>
         :root {
             /* --- POLISHED SAAS THEME --- */
-            --bg-body: #F8FAFC;       
+            --bg-body: #F8FAFC;        
             --bg-surface: #FFFFFF;    
             --border-subtle: #E2E8F0; 
             
-            --text-main: #0F172A;     
+            --text-main: #0F172A;      
             --text-muted: #64748B;    
             
             --accent-primary: #6366F1; /* Indigo */
@@ -36,9 +36,9 @@
             --night-wash: rgba(15, 23, 42, 0.85);
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); overflow: hidden; }
+        /* Enforce Desktop Width */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); overflow: hidden; min-width: 1280px; }
 
-        /* --- LOGO STYLE (Matches Index.html) --- */
         .kindness-purple {
             background: linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #6366F1 100%);
             -webkit-background-clip: text;
@@ -46,8 +46,7 @@
             display: inline-block;
         }
 
-        /* --- LAYOUT --- */
-        #app-shell { display: flex; height: 100%; width: 100%; }
+        #app-shell { display: flex; height: 100%; width: 100%; min-width: 1280px; }
 
         /* --- SIDEBAR --- */
         #sidebar { 
@@ -62,9 +61,14 @@
         .sidebar-header { 
             padding: 24px; 
             background: var(--bg-surface); 
-            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; 
+            display: flex; flex-direction: column; flex-shrink: 0; 
         }
+        .header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         
+        #guest-note {
+            font-size: 0.65rem; color: #EF4444; font-weight: 600; margin-top: 4px; text-align: right; display: none;
+        }
+
         .mgmt-section { padding: 12px 20px; border-bottom: 1px solid var(--border-subtle); }
         
         .mgmt-input { 
@@ -110,10 +114,11 @@
             flex-grow: 1; position: relative; overflow: hidden; display: none; 
             background: #475569; 
         } 
+        
         #map-bg { 
             width: 100%; height: 100%; 
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg'); 
-            background-size: cover; 
+            background-size: 100% 100%; 
             opacity: 0.8; 
             filter: invert(1) hue-rotate(200deg) saturate(0.6) brightness(1.5) contrast(1.1); 
         }
@@ -134,8 +139,39 @@
         .chart-header-row span { color: var(--text-muted); font-weight: 500; font-size: 0.85rem; }
 
         .chart-controls { display: flex; align-items: center; gap: 10px; }
-        .chart-legend { display: flex; gap: 10px; font-size: 0.7rem; font-weight: 600; background: white; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border-subtle); color: var(--text-muted); box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-right: 5px; }
+        
+        /* 3. FIXED: Legend Alignment & Spacing */
+        .chart-legend { 
+            display: flex; gap: 15px; align-items: center; /* Perfect vertical alignment */
+            font-size: 0.7rem; font-weight: 600; 
+            background: white; padding: 6px 12px; border-radius: 20px; 
+            border: 1px solid var(--border-subtle); color: var(--text-muted); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-right: 5px; 
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-box { width: 8px; height: 8px; border-radius: 2px; }
+
+        /* 2. FIXED: Unified Button Theme */
+        .btn-action {
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            transition: 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-action-primary {
+            background: var(--text-main); color: white; border: none;
+        }
+        .btn-action-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .btn-action-secondary {
+            background: white; color: var(--text-main); border: 1px solid var(--border-subtle);
+        }
+        .btn-action-secondary:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
 
         .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
         .filter-pill { 
@@ -184,7 +220,7 @@
         .match-row .chart-box:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .highlight-slot { border: 2px solid var(--accent-primary) !important; z-index: 10; transform: scale(1.05); }
 
-        /* CARDS AREA (Moved Up) */
+        /* CARDS AREA */
         #rec-area-wrapper { 
             margin-top: 10px; 
             padding-top: 10px; 
@@ -198,11 +234,9 @@
         
         .rec-column-left { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* FIX: Align Left & Right Columns + Fix Cutoff */
         #rec-results, #selected-results { 
             display: flex; 
             gap: 15px; 
-            /* Top padding prevents hover card from being clipped by overflow:auto */
             padding: 10px 5px 20px 5px; 
         }
         #rec-results { overflow-x: auto; }
@@ -210,7 +244,6 @@
 
         .rec-column-right { flex-shrink: 0; width: 300px; padding-left: 20px; border-left: 1px solid var(--border-subtle); display: flex; flex-direction: column; }
 
-        /* FIX: Increased Height to 320px to prevent clipping of button */
         .rec-card { 
             width: 280px; 
             height: 320px; 
@@ -242,7 +275,6 @@
 
         .selected-card-style { border: 2px solid var(--accent-primary); background: #EEF2FF; }
 
-        /* Floating Scheduler */
         #scheduler { 
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); 
             padding: 6px 6px 6px 20px; 
@@ -271,12 +303,21 @@
         #scheduler button:hover { transform: scale(1.03); background: var(--accent-primary); }
 
         .map-floating-btn { 
-            position: absolute; top: 20px; right: 20px; padding: 10px 20px; 
-            background: white; color: var(--text-main); border: 1px solid var(--border-subtle); 
-            border-radius: 10px; font-weight: 700; cursor: pointer; z-index: 100; transition: 0.2s; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); font-size: 0.8rem;
+            position: absolute; top: 20px; right: 20px;
+            /* Merged btn-action style here manually for absolute positioning context */
+            padding: 10px 20px; 
+            border-radius: 10px; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            transition: 0.2s;
+            background: white; color: var(--text-main); border: 1px solid var(--border-subtle);
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
-        .map-floating-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .map-floating-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); color: var(--accent-primary); border-color: var(--accent-primary); }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -294,7 +335,9 @@
         #share-toast.show { opacity: 1; top: 40px; }
         
         .map-label-text { font-size: 10px; font-weight: 900; fill: white; stroke: #020617; stroke-width: 3px; paint-order: stroke; }
-        .grid-line { stroke: rgba(255,255,255,0.2); stroke-width: 1px; stroke-dasharray: 4; }
+        
+        /* 1. FIXED: Grid Line Visibility on Map */
+        .grid-line { stroke: rgba(255,255,255,0.6); stroke-width: 2px; stroke-dasharray: 4; }
     </style>
 </head>
 <body>
@@ -306,8 +349,11 @@
 <div id="app-shell">
     <aside id="sidebar">
         <div class="sidebar-header">
-            <span class="text-4xl font-black tracking-tighter kindness-purple">orbit</span>
-            <span id="logout-btn" onclick="logout()" style="cursor:pointer; font-size:0.75rem; color:var(--text-muted); font-weight:600; margin-left: auto;">Logout</span>
+            <div class="header-top">
+                <span class="text-4xl font-black tracking-tighter kindness-purple">orbit</span>
+                <span id="logout-btn" onclick="logout()" style="cursor:pointer; font-size:0.75rem; color:var(--text-muted); font-weight:600;">Logout</span>
+            </div>
+            <div id="guest-note">Log in to save</div>
         </div>
         <div class="mgmt-section"><input type="text" id="cityInput" class="mgmt-input" placeholder="City name..."><button id="addCityBtn" class="btn-main btn-login" onclick="lookupCity()">ADD OFFICE</button></div>
         <div class="mgmt-section"><input type="text" id="newName" class="mgmt-input" placeholder="Teammate Name..."><select id="newLoc" class="mgmt-input" style="appearance:none;"></select><button class="btn-main btn-signup" onclick="addMember()">ADD TEAMMATE</button></div>
@@ -315,10 +361,38 @@
     </aside>
 
     <main id="main-view-container">
-        <div id="map-area"><div id="map-bg"></div><svg id="svg-map" viewBox="0 0 800 400" preserveAspectRatio="none"><g id="day-night-layer"></g><g id="grid-lines-layer"></g><g id="grid-label-layer"></g><g id="marker-layer"></g></svg><button class="map-floating-btn" onclick="toggleView('rec')">📊 Grid View</button></div>
+        <div id="map-area">
+            <div id="map-bg"></div>
+            <svg id="svg-map" viewBox="0 0 800 400" preserveAspectRatio="none">
+                <g id="day-night-layer"></g>
+                <g id="grid-lines-layer"></g>
+                <g id="grid-label-layer"></g>
+                <g id="marker-layer"></g>
+            </svg>
+            <button class="map-floating-btn" onclick="toggleView('rec')">📊 Grid View</button>
+        </div>
         
         <div id="rec-view">
-            <div class="fixed-header-group"><div class="chart-centered-content"><div class="chart-header-row"><div><h2>Team Overlap</h2><span>Visualizing global availability</span></div><div class="chart-controls"><div class="chart-legend"><div class="legend-item"><div class="legend-box" style="background:var(--accent-secondary)"></div> Match</div><div class="legend-item"><div class="legend-box" style="background:var(--status-lunch)"></div> Ask</div><div class="legend-item"><div class="legend-box" style="background:var(--status-weekend)"></div> Sleep</div></div><button onclick="shareDashboard()" style="padding:10px 20px; background:white; color:var(--text-main); border:1px solid var(--border-subtle); border-radius:12px; cursor:pointer; font-weight:700; transition:0.2s;">Share</button><button onclick="toggleView('map')" style="padding:10px 20px; background:var(--text-main); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">World Map</button></div></div><div id="tz-filter-bar" class="filter-bar"></div></div></div>
+            <div class="fixed-header-group">
+                <div class="chart-centered-content">
+                    <div class="chart-header-row">
+                        <div>
+                            <h2>Team Overlap</h2>
+                            <span>Visualizing global availability</span>
+                        </div>
+                        <div class="chart-controls">
+                            <div class="chart-legend">
+                                <div class="legend-item"><div class="legend-box" style="background:var(--accent-secondary)"></div> Match</div>
+                                <div class="legend-item"><div class="legend-box" style="background:var(--status-lunch)"></div> Ask</div>
+                                <div class="legend-item"><div class="legend-box" style="background:var(--status-weekend)"></div> Off Work</div>
+                            </div>
+                            <button onclick="shareDashboard()" class="btn-action btn-action-secondary">Share</button>
+                            <button onclick="toggleView('map')" class="btn-action btn-action-primary">World Map</button>
+                        </div>
+                    </div>
+                    <div id="tz-filter-bar" class="filter-bar"></div>
+                </div>
+            </div>
             <div class="scrollable-body"><div class="chart-centered-content"><div id="chart-body"></div><div id="rec-area-wrapper"><div class="rec-column-left"><div class="section-header">✨ Best Windows</div><div id="rec-results"></div></div><div class="rec-column-right" id="selected-section" style="display:none;"><div class="section-header" style="color:var(--accent-primary);">🎯 Selected Time</div><div id="selected-results"></div></div></div></div></div>
         </div>
 
@@ -350,15 +424,17 @@
         if (session) { 
             isGuestMode = false; 
             document.getElementById('logout-btn').innerText = "Logout"; 
+            document.getElementById('guest-note').style.display = 'none'; // Hide note
             loadData(); 
         } else {
-            enableGuestMode(); // Auto-enable guest
+            enableGuestMode(); 
         }
     }
     
     function enableGuestMode() { 
         isGuestMode = true; 
         document.getElementById('logout-btn').innerText = "☁️ Guest"; 
+        document.getElementById('guest-note').style.display = 'block'; // Show note
         loadData(); 
     }
     
@@ -452,11 +528,8 @@
             for(let i=0; i<count; i++){ const slot = sUTC + (i * sMs), lD = new Date(slot + (loc.offset * 3600000)); let h = lD.getUTCHours(); let dP = (h === 0 && lD.getUTCMinutes() === 0) ? `<span style="color:var(--slack-purple); font-weight:900; font-size:0.6rem;">${lD.toLocaleDateString('en-US', { weekday: 'short', timeZone:'UTC' })}</span>` : h; rowH += `<div class="time-tick">${dP}</div>`; }
             rowH += `</div><div class="chart-row"><div class="chart-label"><span>${loc.tz}</span><div class="pref-group"><div class="pref-pill ${prefs.has('early')?'active':''}" onclick="togglePreference('${key}', 'early')">🌅</div><div class="pref-pill ${prefs.has('night')?'active':''}" onclick="togglePreference('${key}', 'night')">🦉</div><div class="pref-pill ${prefs.has('global')?'global-active':''}" onclick="togglePreference('${key}', 'global')">🌍</div></div></div><div class="chart-grid">`;
             for(let i=0; i<count; i++){ const slot = sUTC + (i * sMs), lD = new Date(slot + (loc.offset * 3600000)), h = lD.getUTCHours() + (lD.getUTCMinutes()/60), s = getStatus(slot + (loc.offset * 3600000), h); let isG = false; if (lD.getUTCDay() !== 0 && lD.getUTCDay() !== 6) { if(prefs.has('global')) { if(h>=6 && h<24) isG = true; } else { if(!(h>=22.5 || h<7)) { if((h>=9 && h<12)||(h>=13.5 && h<17)) isG = true; if(prefs.has('early') && h>=7 && h<9) isG = true; if(prefs.has('night') && h>=17 && h<22.5) isG = true; } } } 
-            
-            // UPDATED GRID BOX COLORS (Brighter)
             const bgColor = isG ? '#D1FAE5' : (s.isRed ? '#F1F5F9' : '#FEF3C7');
             const textColor = isG ? '#047857' : (s.isRed ? '#94A3B8' : '#B45309');
-            
             rowH += `<div class="chart-box ${isFitMode && workDateUTC_MS === slot ? 'highlight-slot' : ''}" style="background:${bgColor}; color:${textColor};">${isG ? '💻' : s.emoji}</div>`; }
             rowH += `</div></div></div>`;
             body.innerHTML += rowH;
