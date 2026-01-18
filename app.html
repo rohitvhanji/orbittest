@@ -369,7 +369,7 @@
                 <g id="grid-label-layer"></g>
                 <g id="marker-layer"></g>
             </svg>
-            <button class="map-floating-btn" onclick="toggleView('rec')">📊 Grid View</button>
+            <button class="map-floating-btn" onclick="toggleView('rec')"> Team View</button>
         </div>
         
         <div id="rec-view">
@@ -534,7 +534,7 @@
             rowH += `</div></div></div>`;
             body.innerHTML += rowH;
         });
-        body.innerHTML += `<div class="chart-row match-row"><div class="chart-label">MATCH</div><div class="chart-grid" id="m-grid"></div></div>`;
+        body.innerHTML += `<div class="chart-row match-row"><div class="chart-label">Status</div><div class="chart-grid" id="m-grid"></div></div>`;
         const g = document.getElementById('m-grid');
         for(let i=0; i<count; i++){ const slot = sUTC + (i * sMs), data = evaluateMatch(slot, parseFloat(rV==='local'?-1*(new Date().getTimezoneOffset()/60):rV), dM, "Team"); allProcessedSlots.push({ utc: slot, ...data }); const box = document.createElement('div'); box.className = 'chart-box'; if (isFitMode && workDateUTC_MS === slot) box.classList.add('highlight-slot'); box.style.background = data.color; box.onclick = () => syncAndRender(slot); g.appendChild(box); }
         const rc = document.getElementById('rec-results'); rc.innerHTML = ''; allProcessedSlots.filter(r => !r.isRed).sort((a,b) => b.totalScore - a.totalScore || a.utc - b.utc).slice(0, 3).forEach(s => renderTile(s, rc, false));
