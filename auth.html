@@ -5,39 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orbit | Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F9FAFB; }
-        .glass-panel { background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); border: 1px solid #e2e8f0; }
+        :root {
+            --orbit-slate: #020617;
+        }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--orbit-slate); 
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- ROTATING BACKGROUND --- */
+        .bg-mesh { 
+            position: absolute; 
+            inset: -50%; /* Make it larger than screen to rotate without edges showing */
+            width: 200%; 
+            height: 200%; 
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg'); 
+            background-size: cover; 
+            background-position: center;
+            opacity: 0.2;
+            filter: invert(1) hue-rotate(220deg) saturate(0.2);
+            z-index: 0;
+            animation: drift 200s linear infinite; 
+        }
+        @keyframes drift { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
+        }
+
+        /* --- WHITE CARD (Matches Landing Page Left Section) --- */
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 2.5rem; /* Rounded 3xl */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        /* --- INPUT FIELDS (Light Mode) --- */
+        .input-light {
+            background: #F8FAFC; /* Slate-50 */
+            border: 1px solid #E2E8F0; /* Slate-200 */
+            color: #0F172A; /* Slate-900 */
+            transition: all 0.3s ease;
+        }
+        .input-light:focus {
+            background: white;
+            border-color: #8B5CF6; /* Purple */
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+        .input-light::placeholder {
+            color: #94A3B8; /* Slate-400 */
+        }
+
+        /* --- BRANDING --- */
+        .kindness-purple {
+            background: linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-primary {
+            background: #0F172A; /* Slate 900 */
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background: #1E293B;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #0F172A;
+            border: 2px solid #E2E8F0;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover {
+            border-color: #0F172A;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
-<body class="h-screen w-full flex items-center justify-center relative overflow-hidden">
-    <div class="absolute inset-0 z-0 opacity-10" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg'); background-size: cover; filter: grayscale(1);"></div>
+<body>
+    
+    <div class="bg-mesh"></div>
 
-    <div class="glass-panel relative z-10 w-full max-w-md p-10 rounded-3xl text-center">
-        <div class="mb-8">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight mb-2">Welcome to Orbit</h1>
-            <p class="text-slate-500 text-sm">Sync your global team with kindness.</p>
+    <div class="login-card">
+        
+        <div class="mb-10">
+            <div class="mb-6">
+                <span class="text-6xl font-black tracking-tighter kindness-purple drop-shadow-sm">orbit</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+            <p class="text-slate-500 text-sm font-medium">Sync your global team with kindness.</p>
         </div>
 
         <div class="flex flex-col gap-4">
-            <input type="email" id="auth-email" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:outline-none transition font-bold text-slate-800 placeholder-slate-400" placeholder="Email Address">
-            <input type="password" id="auth-pass" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:outline-none transition font-bold text-slate-800 placeholder-slate-400" placeholder="Password">
+            <input type="email" id="auth-email" class="input-light w-full p-4 rounded-2xl font-bold text-sm" placeholder="Email Address">
+            <input type="password" id="auth-pass" class="input-light w-full p-4 rounded-2xl font-bold text-sm" placeholder="Password">
             
-            <button onclick="handleAuth('login')" class="w-full py-4 rounded-xl bg-indigo-600 text-white font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
+            <button onclick="handleAuth('login')" class="btn-primary w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-xs mt-2">
                 Log In
             </button>
-            <button onclick="handleAuth('signup')" class="w-full py-4 rounded-xl bg-white border-2 border-slate-200 text-slate-900 font-black uppercase tracking-widest text-xs hover:border-slate-900 transition">
+            <button onclick="handleAuth('signup')" class="btn-secondary w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-xs">
                 Create Account
             </button>
         </div>
 
-        <div id="auth-status" class="mt-4 text-red-500 text-xs font-bold min-h-[20px]"></div>
+        <div id="auth-status" class="mt-6 text-red-500 text-xs font-bold min-h-[20px]"></div>
         
         <div class="mt-8 pt-6 border-t border-slate-100">
-            <a href="app.html" class="text-xs font-bold text-slate-400 hover:text-slate-800 transition">Continue as Guest &rarr;</a>
+            <a href="app.html" class="text-xs font-bold text-slate-400 hover:text-slate-900 transition uppercase tracking-widest">Continue as Guest &rarr;</a>
         </div>
     </div>
 
@@ -50,6 +147,11 @@
             const password = document.getElementById('auth-pass').value;
             const statusDiv = document.getElementById('auth-status');
             
+            if(!email || !password) {
+                statusDiv.innerText = "Please enter email and password.";
+                return;
+            }
+
             statusDiv.innerText = "Processing...";
             
             const { data, error } = type === 'login' 
